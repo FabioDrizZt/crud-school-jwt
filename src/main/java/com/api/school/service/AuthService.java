@@ -43,7 +43,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.USER);
 
-        userRepository.save(user);
+        this.userRepository.save(user);
         return new AuthDto(this.jwtService.getToken(user));
     }
 

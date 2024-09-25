@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "586E3272357538782F413F4428472B4B62506553!685$66B597033733676397924";
+    private static final String SECRET_KEY = "586E3272357538782F413F4428472B4B6250655368566B597033733676397924";
 
     public String getToken(UserDetails user) {
         return getToken(new HashMap<>(), user);
@@ -39,13 +39,30 @@ public class JwtService {
     }
 
     public String getUsernameFromToken(String token) {
-        return getClaim(token, Claims::getSubject);
+        try {
+            String username = getClaim(token, Claims::getSubject);
+            System.out.println("Token: " + token);
+            System.out.println("Username extraído: " + username);
+            return username;
+        } catch (Exception e) {
+            System.out.println("Error extrayendo username del token: " + e.getMessage());
+            return null;
+        }
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        if (username == null || !username.equals(userDetails.getUsername())) {
+            System.out.println("Username no coincide: token=" + username + ", user=" + userDetails.getUsername());
+            return false;
+        }
+        if (isTokenExpired(token)) {
+            System.out.println("Token expirado.");
+            return false;
+        }
+        return true;
     }
+
 
     private Claims getAllClaims(String token) {
         return Jwts

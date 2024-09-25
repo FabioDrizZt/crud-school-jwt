@@ -37,12 +37,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtService.getUsernameFromToken(token);
         } catch (final Exception e) {
+            System.out.println("Error obteniendo el username del token: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-            String jsonResponse = String.format("{ \"message\": [\"%s\"]}","El token no es válido");
+            String jsonResponse = String.format("{ \"message\": [\"%s\"]}", "El token no es válido");
             response.getWriter().write(jsonResponse);
             return;
         }
+
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -60,10 +62,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getTokenFromRequest(HttpServletRequest request) {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
+        System.out.println("Authorization Header: " + authHeader);
         if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }
         return null;
     }
+
 }
